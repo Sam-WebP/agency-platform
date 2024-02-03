@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "agency_platform",
+            "database": "agency_platform",
+            "username": "root",
+            "socketPath": "/var/run/mysqld/mysqld.sock",
+            "password": ""
+        }
+    ]
+}
