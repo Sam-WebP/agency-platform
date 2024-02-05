@@ -15,5 +15,6 @@
             "socketPath": "/var/run/mysqld/mysqld.sock",
             "password": ""
         }
-    ]
+    ],
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }
