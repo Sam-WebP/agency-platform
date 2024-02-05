@@ -7,6 +7,8 @@ const Page = async () => {
   const authUser = await currentUser()
   if (!authUser) return redirect('/sign-in')
 
+  const agencyId = await verifyAndAcceptInvitation()
+
   //get users details
   const user = await getAuthUserDetails()
   return <div>Agency</div>
