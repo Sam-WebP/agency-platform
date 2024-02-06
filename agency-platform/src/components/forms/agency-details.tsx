@@ -3,7 +3,7 @@ import { Agency } from '@prisma/client'
 import { useForm } from 'react-hook-form'
 import React, { useEffect, useState } from 'react'
 import { NumberInput } from '@tremor/react'
-//import { v4 } from 'uuid'
+import { v4 } from 'uuid'
 
 import { useRouter } from 'next/navigation'
 import {
@@ -41,20 +41,21 @@ import FileUpload from '../global/file-upload'
 import { Input } from '../ui/input'
 import { Switch } from '../ui/switch'
 import {
+  deleteAgency,
   initUser,
-  //deleteAgency,
-  //initUser,
   saveActivityLogsNotification,
   updateAgencyDetails,
-  //upsertAgency,
+  upsertAgency,
 } from '@/src/lib/queries'
 import { Button } from '../ui/button'
 import Loading from '../global/loading'
-//import Loading from '../global/loading'
 
 type Props = {
   data?: Partial<Agency>
 }
+
+//Form component docs https://ui.shadcn.com/docs/components/form
+//Form schema docs https://zod.dev/
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: 'Agency name must be atleast 2 chars.' }),
@@ -101,68 +102,68 @@ const AgencyDetails = ({ data }: Props) => {
     try {
       let newUserData
       let custId
-      if (!data?.id) {
-        const bodyData = {
-          email: values.companyEmail,
-          name: values.name,
-          shipping: {
-            address: {
-              city: values.city,
-              country: values.country,
-              line1: values.address,
-              postal_code: values.zipCode,
-              state: values.zipCode,
-            },
-            name: values.name,
-          },
-          address: {
-            city: values.city,
-            country: values.country,
-            line1: values.address,
-            postal_code: values.zipCode,
-            state: values.zipCode,
-          },
-        }
+      // Stripe info:
+      // if (!data?.id) {
+      //   const bodyData = {
+      //     email: values.companyEmail,
+      //     name: values.name,
+      //     shipping: {
+      //       address: {
+      //         city: values.city,
+      //         country: values.country,
+      //         line1: values.address,
+      //         postal_code: values.zipCode,
+      //         state: values.zipCode,
+      //       },
+      //       name: values.name,
+      //     },
+      //     address: {
+      //       city: values.city,
+      //       country: values.country,
+      //       line1: values.address,
+      //       postal_code: values.zipCode,
+      //       state: values.zipCode,
+      //     },
+      //   }
 
-        const customerResponse = await fetch('/api/stripe/create-customer', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(bodyData),
-        })
-        const customerData: { customerId: string } =
-          await customerResponse.json()
-        custId = customerData.customerId
-      }
+      //   // const customerResponse = await fetch('/api/stripe/create-customer', {
+      //   //   method: 'POST',
+      //   //   headers: {
+      //   //     'Content-Type': 'application/json',
+      //   //   },
+      //   //   body: JSON.stringify(bodyData),
+      //   // })
+      //   // const customerData: { customerId: string } =
+      //   //   await customerResponse.json()
+      //   // custId = customerData.customerId
+      // }
 
       newUserData = await initUser({ role: 'AGENCY_OWNER' })
-      if (!data?.customerId && !custId) return
+      if (!data?.id) {
 
-      const response = await upsertAgency({
-        id: data?.id ? data.id : v4(),
-        customerId: data?.customerId || custId || '',
-        address: values.address,
-        agencyLogo: values.agencyLogo,
-        city: values.city,
-        companyPhone: values.companyPhone,
-        country: values.country,
-        name: values.name,
-        state: values.state,
-        whiteLabel: values.whiteLabel,
-        zipCode: values.zipCode,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        companyEmail: values.companyEmail,
-        connectAccountId: '',
-        goal: 5,
-      })
-      toast({
-        title: 'Created Agency',
-      })
-      if (data?.id) return router.refresh()
-      if (response) {
-        return router.refresh()
+        await upsertAgency({
+          id: data?.id ? data.id : v4(),
+          customerId: data?.customerId || custId || '',
+          address: values.address,
+          agencyLogo: values.agencyLogo,
+          city: values.city,
+          companyPhone: values.companyPhone,
+          country: values.country,
+          name: values.name,
+          state: values.state,
+          whiteLabel: values.whiteLabel,
+          zipCode: values.zipCode,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyEmail: values.companyEmail,
+          connectAccountId: '',
+          goal: 5,
+        })
+      
+        toast({
+          title: 'Created Agency',
+        })
+      
       }
     } catch (error) {
       console.log(error)
@@ -172,6 +173,7 @@ const AgencyDetails = ({ data }: Props) => {
         description: 'could not create your agency',
       })
     }
+    
   }
   const handleDeleteAgency = async () => {
     if (!data?.id) return
