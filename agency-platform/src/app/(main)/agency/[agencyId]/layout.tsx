@@ -58,3 +58,5 @@ const layout = async ({ children, params }: Props) => {
 }
 
 export default layout
+
+
